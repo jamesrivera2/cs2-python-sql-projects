@@ -1,41 +1,37 @@
-# Personal Expense Tracker
+# Library Book Manager
 
-A Python application that tracks income and expenses by category, generates spending summaries, and exports reports to CSV.
+A command-line Python application for tracking library books, member registrations, and checkouts using SQLite.
 
 ## Learning Goals
-- Object-oriented design: separating data models (`Transaction`) from persistence (`ExpenseRepository`)
-- SQL aggregation: `SUM`, `COUNT`, `GROUP BY`, `CASE WHEN`
-- String manipulation in SQL: `SUBSTR` for grouping dates by month
-- Exporting data with Python's built-in `csv` module
-- Validating data at the model layer before writing to the database
+- Multi-table relational design with foreign key constraints
+- Using `PRAGMA foreign_keys = ON` in SQLite
+- Date arithmetic with Python's `datetime` module
+- JOIN queries across three tables
+- Business logic layered on top of database operations (availability check)
 
-## Project Structure
+## Schema
 
 ```
-expense_tracker/
-├── expense_tracker.py   # all code: models, repository, display helpers, demo
-└── README.md
+books              members            checkouts
+─────              ───────            ─────────
+id (PK)            id (PK)            id (PK)
+title              name               book_id   (FK → books)
+author             email (UNIQUE)     member_id (FK → members)
+isbn (UNIQUE)                         checked_out  (ISO date)
+copies                                due_date     (ISO date)
 ```
 
 ## How to Run
 
 ```bash
-python expense_tracker.py
+python library.py
 ```
 
 No external packages required.
 
-## Key Design Patterns
-
-| Pattern | Where used |
-|---|---|
-| Repository pattern | `ExpenseRepository` encapsulates all SQL |
-| Value object | `Transaction` holds data and validates on construction |
-| Separation of concerns | Display helpers are pure functions; no SQL in them |
-
 ## Extension Ideas (for students)
-1. Add an `argparse` CLI: `python expense_tracker.py add --type expense --category Groceries --amount 45.50`
-2. Add a budget per category and warn when the user goes over
-3. Plot monthly spending with `matplotlib`
-4. Add a `tags` many-to-many relationship to transactions
-5. Write a Flask or FastAPI web front-end backed by this repository
+1. Add a `loan_history` table to keep a permanent record of past checkouts (instead of deleting on return)
+2. Add a late-fee calculator based on the number of days overdue
+3. Implement a command-line interface with `argparse` or `cmd.Cmd`
+4. Add a `reservations` table so members can queue for unavailable books
+5. Write pytest tests that use an in-memory SQLite database (`:memory:`)
